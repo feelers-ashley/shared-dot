@@ -10,17 +10,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// STEP 5 · each device gets its own random id and colour
+// STEP 5 · each device gets its own id and colour
 const me = Math.random().toString(36).slice(2, 8);
 let myHue;
-let dots = {}; // STEP 6 · every device's dot, by id
+
+// STEP 6 · every device's dot, by id
+let dots = {};
+
+// STEP 8 · when this device last wrote
+let lastSend = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
   myHue = floor(random(360));
 
-  // STEP 4 + 6 · listen: run this whenever anything under "dots" changes
+  // STEP 4 + 6 · listen: runs whenever anything under "dots" changes
   db.ref("dots").on("value", (snapshot) => {
     dots = snapshot.val() || {};
   });
@@ -35,26 +40,41 @@ function draw() {
   background(20);
 
   // STEP 6 · draw every dot in the database
+  noStroke();
   for (const [id, d] of Object.entries(dots)) {
-    noStroke();
     fill(d.hue, 70, 100);
     circle(d.x * width, d.y * height, id === me ? 50 : 36);
   }
 
-  fill(255);
-  text(Object.keys(dots).length + " here", 16, height - 16);
+  fill(0, 0, 100);
+  textSize(14);
+  text(
+    Object.keys(dots).length + " here · drag to move your dot",
+    16,
+    height - 16
+  );
 }
 
-// STEP 3 + 5 · write: send my position (0–1, so any screen size works)
-// STEP 8 · throttle: no more than ~20 writes a second
-let lastSend = 0;
-function mouseDragged() {
-  if (millis() - lastSend < 50) return false;
+// STEP 3 + 5 · write: my position as 0–1, so every screen size agrees
+function sendDot() {
+  if (millis() - lastSend < 50) return; // STEP 8 · ~20 writes a second
   lastSend = millis();
   db.ref("dots/" + me).set({
     x: mouseX / width,
     y: mouseY / height,
     hue: myHue,
   });
+}
+
+function mousePressed() {
+  sendDot();
   return false;
+} // a tap places your dot
+function mouseDragged() {
+  sendDot();
+  return false;
+} // a drag moves it
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
