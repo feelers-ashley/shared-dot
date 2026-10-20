@@ -11,10 +11,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+const me = Math.random().toSring(36).slice(2, 8);
+let myHue;
 let remote = { x: 0.5, y: 0.5 };
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  colorMode(HSB);
+  myHue = floor(random(360));
   db.ref("dot").on("value", (snapshot) => {
     remote = snapshot.val() || remote;
   });
@@ -26,6 +30,6 @@ function draw() {
 }
 
 function mouseDragged() {
-  db.ref("dot").set({ x: mouseX / width, y: mouseY / height });
+  db.ref("dot" + me).set({ x: mouseX / width, y: mouseY / height, hue: myHue });
   return false;
 }
