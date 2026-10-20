@@ -4,6 +4,8 @@ const firebaseConfig = {
   databaseURL:
     "https://signalroom-c4c48-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "signalroom-c4c48",
+  storageBucket: "signalroom-c4c48.firebasestorage.app",
+  messagingSenderId: "934108614640",
   appId: "1:934108614640:web:6fb057d17794c733c35735",
 };
 firebase.initializeApp(firebaseConfig);
