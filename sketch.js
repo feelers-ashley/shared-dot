@@ -22,7 +22,7 @@ function setup() {
   colorMode(HSB);
   myHue = floor(random(360));
   db.ref("dots").on("value", (snapshot) => {
-    dots = snapshot.val() || {}};
+    dots = snapshot.val() || {};
   });
 }
 
@@ -35,6 +35,10 @@ function draw() {
 }
 
 function mouseDragged() {
-  db.ref("dots/" + me).set({ x: mouseX / width, y: mouseY / height, hue: myHue });
+  db.ref("dots/" + me).set({
+    x: mouseX / width,
+    y: mouseY / height,
+    hue: myHue,
+  });
   return false;
 }
