@@ -13,23 +13,28 @@ const db = firebase.database();
 
 const me = Math.random().toSring(36).slice(2, 8);
 let myHue;
+let dots = {};
+
 let remote = { x: 0.5, y: 0.5 };
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   colorMode(HSB);
   myHue = floor(random(360));
-  db.ref("dot").on("value", (snapshot) => {
-    remote = snapshot.val() || remote;
+  db.ref("dots").on("value", (snapshot) => {
+    dots = snapshot.val() || {}};
   });
 }
 
 function draw() {
   background(20);
-  circle(remote.x * width, remote.y * height, 50);
+  for (const [id, d] of Object.entries(dots)) {
+    fill(d.hue, 70, 100);
+    circle(d.x * width, d.y * height, id === me ? 50 : 36);
+  }
 }
 
 function mouseDragged() {
-  db.ref("dot" + me).set({ x: mouseX / width, y: mouseY / height, hue: myHue });
+  db.ref("dots/" + me).set({ x: mouseX / width, y: mouseY / height, hue: myHue });
   return false;
 }
